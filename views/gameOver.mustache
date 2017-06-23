@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Game Over</title>
+    <link rel="stylesheet" href="/css/gameOver.css">
+  </head>
+  <body>
+    <h1>Game Over Man</h1>
+    <h2>Correct word was {{#chosenWord}}{{letter}}{{/chosenWord}}</h2>
+    <form action="/gameStart" method="get">
+      <h3>Would You Like To Play Again?</h3>
+      <button type="submit" name="again" value="yes">Play Again</button>
+    </form>
+  </body>
+</html>

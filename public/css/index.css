@@ -1,0 +1,14 @@
+.header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 100px;
+}
+
+.chosenWord{
+  text-align: center;
+}
+
+form{
+  text-align: center;
+}
