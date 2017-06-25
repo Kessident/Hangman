@@ -4,25 +4,22 @@ const bodyParser = require("body-parser");
 const expressValidator = require("express-validator");
 const session = require("express-session");
 const path = require("path");
-const fs = require('fs');
+const fs = require("fs");
+const jsonFile = require("jsonfile");
 
 //Word List
 const words = fs.readFileSync("/usr/share/dict/words", "utf-8").toLowerCase().split("\n");
-// let easyWords = [],
-//   medWords = [],
-//   hardWords = [];
-// words.forEach(function(word) {
-//   if (4 <= word.length && word.length <= 6) {
-//     easyWords.push(word);
-//   } else if (6 <= word.length && word.length <= 8) {
-//     medWords.push(word);
-//   } else if (words.length >= 8) {
-//     hardWords.push(word);
-//   }
-// });
 
 //Express App Initialization
 const app = express();
+
+//Winner File
+let file = "winners.json";
+let winners = [];
+jsonFile.readFile(file,function (err, obj) {
+  winners = obj.winners;
+});
+
 //Public Directory Setup
 app.use(express.static(path.join(__dirname, "public")));
 //Mustache View Engine
@@ -47,7 +44,8 @@ let userInfo = {
   chosenWord: [],
   guessedLetters: [],
   correctLetters: [],
-  guesses: 8
+  guesses: 8,
+  word:""
 };
 
 function correctlyGuessed() {
@@ -63,7 +61,11 @@ function correctlyGuessed() {
 app.get("/", function(req, res) {
   if (userInfo.chosenWord.length > 0) {
     if (!correctlyGuessed()) {
-      res.render("index", userInfo);
+      if (userInfo.guesses > 0){
+        res.render("index", userInfo);
+      }  else {
+        res.render("gameOver", userInfo);
+      }
     } else {
       res.render("gameWin",userInfo);
     }
@@ -76,7 +78,7 @@ app.post("/", function(req, res) {
   let guess = req.body.guess;
   let goodGuess = false;
   //If guesses remain
-  if (userInfo.guesses > 1) {
+  if (userInfo.guesses > 0) {
     //guessed before
     if (userInfo.guessedLetters.indexOf(guess) === -1) {
       userInfo.guessedLetters.push(guess);
@@ -98,8 +100,6 @@ app.post("/", function(req, res) {
       userInfo.guesses--;
     }
     res.redirect("/");
-  } else {
-    res.render("gameOver", userInfo);
   }
 });
 
@@ -114,7 +114,6 @@ app.get("/gameStart", function(req, res) {
 });
 
 app.post("/gameStart", function(req, res) {
-  let chosenWord;
   let lowerLimit, upperLimit;
 
   if (req.body.gameMode === "easy") {
@@ -132,23 +131,38 @@ app.post("/gameStart", function(req, res) {
 
   let found = false;
   do {
-    chosenWord = words[Math.floor(Math.random()*words.length)];
-    let len = chosenWord.length;
+    userInfo.word = words[Math.floor(Math.random()*words.length)];
+    let len = userInfo.word.length;
     if (lowerLimit <= len && len <= upperLimit){
       found = true;
     }
     index++;
   } while (!found);
 
-  for (var i = 0; i < chosenWord.length; i++) {
+  for (var i = 0; i < userInfo.word.length; i++) {
     userInfo.chosenWord.push({
-      "letter": chosenWord[i],
+      "letter": userInfo.word.charAt(i),
       "guessed": false
     });
   }
   res.redirect("/");
 });
 
+app.post("/HoF", function (req,res) {
+  let name = req.body.name;
+  let newWin = {
+    "name": name,
+    "word": userInfo.word,
+    "guesses": userInfo.guessedLetters.length
+  };
+  winners.push(newWin);
+  jsonFile.writeFile(file,{"winners":winners});
+  res.redirect("/Winners");
+});
+
+app.get("/Winners",function (req,res) {
+  res.render("Winners", {"winners":winners});
+});
 //fetch request target
 app.get("/getInfo", function(req, res) {
   res.send(userInfo);

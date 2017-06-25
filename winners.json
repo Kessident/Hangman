@@ -1,0 +1,7 @@
+{
+  "winners": [{
+    "name": "test",
+    "word": "Word",
+    "guesses": 42
+  }]
+}

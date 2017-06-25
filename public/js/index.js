@@ -13,7 +13,6 @@ fetch("/getInfo").then(function (response) {
         chosenWord.innerText = chosenWord.innerText + " _";
       }
     }
-    console.log(info);
   });
 });
 
@@ -22,19 +21,19 @@ subBtn.addEventListener("click", function(e) {
   input.value = input.value.toLowerCase();
   if (input.value.length > 1 || input.value.length === 0) {
     input.value = "";
-    error.innerText = "Please enter a single character";
+    error.innerText = "Please enter a single letter";
   } else {
     if (isAlpha(input.value)){
       document.querySelector("form").submit();
     } else {
       input.value = "";
-      error.innerText = "Please enter a single character";
+      error.innerText = "Please enter a single letter";
     }
   }
 });
 
-//checks
+//checks if character is letter
 function isAlpha(str) {
-  let charCode = str.charCodeAt(0);
-  return 65 <= charCode && charCode <= 90;
+  let charCode = str.charCodeAt();
+  return 96 <= charCode && charCode <= 123;
 }
