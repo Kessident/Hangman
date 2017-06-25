@@ -44,14 +44,15 @@ let userInfo = {
   chosenWord: [],
   guessedLetters: [],
   correctLetters: [],
-  guesses: 8,
+  guessesRemain: 8,
+  guesses:0,
   word:""
 };
 
-function correctlyGuessed() {
+function correctlyGuessed(session) {
   let guessed = true;
-  for (var i = 0; i < userInfo.chosenWord.length; i++) {
-    if (!userInfo.chosenWord[i].guessed) {
+  for (var i = 0; i < session.userInfo.chosenWord.length; i++) {
+    if (!session.userInfo.chosenWord[i].guessed) {
       guessed = false;
     }
   }
@@ -59,15 +60,15 @@ function correctlyGuessed() {
 }
 
 app.get("/", function(req, res) {
-  if (userInfo.chosenWord.length > 0) {
-    if (!correctlyGuessed()) {
-      if (userInfo.guesses > 0){
-        res.render("index", userInfo);
+  if (req.session.userInfo) {
+    if (!correctlyGuessed(req.session)) {
+      if (req.session.userInfo.guessesRemain > 0){
+        res.render("index", req.session.userInfo);
       }  else {
-        res.render("gameOver", userInfo);
+        res.render("gameOver", req.session.userInfo);
       }
     } else {
-      res.render("gameWin",userInfo);
+      res.render("gameWin",req.session.userInfo);
     }
   } else {
     res.redirect("/gameStart");
@@ -78,39 +79,42 @@ app.post("/", function(req, res) {
   let guess = req.body.guess;
   let goodGuess = false;
   //If guesses remain
-  if (userInfo.guesses > 0) {
+  if (req.session.userInfo.guessesRemain > 0) {
     //guessed before
-    if (userInfo.guessedLetters.indexOf(guess) === -1) {
-      userInfo.guessedLetters.push(guess);
+    if (req.session.userInfo.guessedLetters.indexOf(guess) === -1) {
+      req.session.userInfo.guessedLetters.push(guess);
     } else {
       goodGuess = true;
+      req.session.userInfo.guesses++;
     }
     //checks if guessed letter is in chosenWord
-    for (let i = 0; i < userInfo.chosenWord.length; i++) {
-      if (guess === userInfo.chosenWord[i].letter) {
-        if (userInfo.correctLetters.indexOf(guess) === -1) {
-          userInfo.correctLetters.push(guess);
+    for (let i = 0; i < req.session.userInfo.chosenWord.length; i++) {
+      if (guess === req.session.userInfo.chosenWord[i].letter) {
+        if (req.session.userInfo.correctLetters.indexOf(guess) === -1) {
+          req.session.userInfo.correctLetters.push(guess);
         }
-        userInfo.chosenWord[i].guessed = true;
+        req.session.userInfo.chosenWord[i].guessed = true;
         goodGuess = true;
       }
     }
     //Guessed letter is not in chosenWord
     if (!goodGuess){
-      userInfo.guesses--;
+      req.session.userInfo.guessesRemain--;
     }
     res.redirect("/");
   }
 });
 
 app.get("/gameStart", function(req, res) {
-  userInfo = {
+  req.session.userInfo = {
     chosenWord: [],
     guessedLetters: [],
     correctLetters: [],
-    guesses: 8
+    guessesRemain: 8,
+    guesses:0,
+    word: ""
   };
-  res.render("gameStart", userInfo);
+  res.render("gameStart", req.session.userInfo);
 });
 
 app.post("/gameStart", function(req, res) {
@@ -131,17 +135,17 @@ app.post("/gameStart", function(req, res) {
 
   let found = false;
   do {
-    userInfo.word = words[Math.floor(Math.random()*words.length)];
-    let len = userInfo.word.length;
+    req.session.userInfo.word = words[Math.floor(Math.random() * words.length)];
+    let len = req.session.userInfo.word.length;
     if (lowerLimit <= len && len <= upperLimit){
       found = true;
     }
     index++;
   } while (!found);
 
-  for (var i = 0; i < userInfo.word.length; i++) {
-    userInfo.chosenWord.push({
-      "letter": userInfo.word.charAt(i),
+  for (var i = 0; i < req.session.userInfo.word.length; i++) {
+    req.session.userInfo.chosenWord.push({
+      "letter": req.session.userInfo.word.charAt(i),
       "guessed": false
     });
   }
@@ -152,8 +156,8 @@ app.post("/HoF", function (req,res) {
   let name = req.body.name;
   let newWin = {
     "name": name,
-    "word": userInfo.word,
-    "guesses": userInfo.guessedLetters.length
+    "word": req.session.userInfo.word,
+    "guesses": req.session.userInfo.guesses
   };
   winners.push(newWin);
   jsonFile.writeFile(file,{"winners":winners});
@@ -165,7 +169,7 @@ app.get("/Winners",function (req,res) {
 });
 //fetch request target
 app.get("/getInfo", function(req, res) {
-  res.send(userInfo);
+  res.send(req.session.userInfo);
 });
 
 app.listen(3000, function() {

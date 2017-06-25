@@ -3,12 +3,12 @@
   <head>
     <meta charset="utf-8">
     <title>GameWin</title>
-    <link rel="stylesheet" href="css/gameWin.css">
+    <link rel="stylesheet" href="css/game.css">
   </head>
   <body>
     <h1>You Won!</h1>
     <h2>The word was {{#chosenWord}}{{letter}}{{/chosenWord}}</h2>
-    <h3>And it only took you <span class="tries"></span> tries with <span class="guesses"></span> guesses remaining!</h3>
+    <h3>And it only took you {{guesses}} guesses with {{guessesRemain}} guesses remaining!</h3>
     <form action="/HoF" method="post">
       <label for="name">Would you like to enter your name for the Winners' List?</label>
       <input type="text" name="name" placeholder="name">
@@ -18,6 +18,5 @@
       <h3>Would You Like To Play Again?</h3>
       <button type="submit" name="again" value="yes">Play Again</button>
     </form>
-    <script type="text/javascript" src="js/gameWin.js"></script>
   </body>
 </html>

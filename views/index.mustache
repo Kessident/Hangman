@@ -9,10 +9,10 @@
     <div class="container">
       <div class="header">
         <h2>Mystery Word</h2>
-        <h3>You have {{guesses}}<br>incorrect guesses left</h3>
+        <h3>You have {{guessesRemain}}<br>incorrect guesses left</h3>
       </div>
       <div class="game">
-        <div class="word"><p class="chosenWord"></p></div>
+        <div class="word"><p class="chosenWord">{{#chosenWord}}{{#guessed}}{{letter}} {{/guessed}}{{^guessed}}_ {{/guessed}}{{/chosenWord}}</p></div>
         <form action="/" method="post">
           <input class="guessLetter" type="text" name="guess" placeholder="Guess a Letter" autofocus>
           <button type="submit">Guess</button><br><br>

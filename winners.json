@@ -1,7 +1,1 @@
-{
-  "winners": [{
-    "name": "test",
-    "word": "Word",
-    "guesses": 42
-  }]
-}
+{"winners":[{"name":"test","word":"Word","guesses":42},{"name":"Will","word":"zoning","guesses":5}]}
