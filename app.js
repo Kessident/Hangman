@@ -167,10 +167,6 @@ app.post("/HoF", function (req,res) {
 app.get("/Winners",function (req,res) {
   res.render("Winners", {"winners":winners});
 });
-//fetch request target
-app.get("/getInfo", function(req, res) {
-  res.send(req.session.userInfo);
-});
 
 app.listen(3000, function() {
   console.log("server running on localhost:3000");
