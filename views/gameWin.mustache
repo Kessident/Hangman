@@ -8,7 +8,7 @@
   <body>
     <h1>You Won!</h1>
     <h2>The word was {{#chosenWord}}{{letter}}{{/chosenWord}}</h2>
-    <h3>And it only took you {{guesses}} guesses with {{guessesRemain}} guesses remaining!</h3>
+    <h3>And it only took you {{guesses}} unique guesses with {{guessesRemain}} guesses remaining!</h3>
     <form action="/HoF" method="post">
       <label for="name">Would you like to enter your name for the Winners' List?</label>
       <input type="text" name="name" placeholder="name">
